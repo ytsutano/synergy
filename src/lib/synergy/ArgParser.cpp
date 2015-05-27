@@ -192,6 +192,10 @@ ArgParser::parseToolArgs(ToolArgs& args, int argc, const char* const* argv)
 			args.m_getArch = true;
 			return true;
 		}
+		else if (isArg(i, argc, argv, NULL, "--get-log-dir", 0)) {
+			args.m_getLogDir = true;
+			return true;
+		}
 		else {
 			return false;
 		}
