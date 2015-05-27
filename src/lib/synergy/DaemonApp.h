@@ -59,4 +59,4 @@ private:
 	FileLogOutputter*	m_fileLogOutputter;
 };
 
-#define LOG_FILENAME "synergyd.log"
+#define LOG_FILENAME "synergy.log"

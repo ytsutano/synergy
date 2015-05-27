@@ -279,9 +279,10 @@ DaemonApp::logFilename()
 	string logFilename;
 	logFilename = ARCH->setting("LogFilename");
 	if (logFilename.empty()) {
-		logFilename = ARCH->getLogDirectory();
-		logFilename.append("/");
-		logFilename.append(LOG_FILENAME);
+		logFilename = synergy::string::sprintf(
+						"%s/%s",
+						ARCH->getLogDirectory().c_str(),
+						LOG_FILENAME);
 	}
 
 	return logFilename;
