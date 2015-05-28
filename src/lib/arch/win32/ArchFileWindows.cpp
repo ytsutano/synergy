@@ -136,7 +136,7 @@ ArchFileWindows::getInstalledDirectory()
 std::string
 ArchFileWindows::getLogDirectory()
 {
-	return getProfileDirectory();
+	return getInstalledDirectory();
 }
 
 std::string
