@@ -56,6 +56,7 @@ class SetupWizard;
 class ZeroconfService;
 class DataDownloader;
 class CommandProcess;
+class LogFileReader;
 
 class MainWindow : public QMainWindow, public Ui::MainWindowBase
 {
@@ -169,6 +170,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindowBase
 		QString getProfileRootForArg();
 		void checkFingerprint(const QString& line);
 		bool autoHide();
+		void setupLogFileReader();
 
 	private:
 		QSettings& m_Settings;
@@ -195,6 +197,7 @@ class MainWindow : public QMainWindow, public Ui::MainWindowBase
 		bool m_SuppressAutoConfigWarning;
 		CommandProcess* m_BonjourInstall;
 		bool m_SuppressEmptyServerWarning;
+		LogFileReader* m_pLogFileReader;
 
 private slots:
 	void on_m_pCheckBoxAutoConfig_toggled(bool checked);

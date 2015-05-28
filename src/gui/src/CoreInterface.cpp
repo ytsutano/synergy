@@ -39,6 +39,12 @@ QString CoreInterface::getProfileDir()
 	return run(args);
 }
 
+QString CoreInterface::getLogDir()
+{
+	QStringList args("--get-log-dir");
+	return run(args);
+}
+
 QString CoreInterface::getArch()
 {
 	QStringList args("--get-arch");

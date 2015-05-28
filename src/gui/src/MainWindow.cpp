@@ -34,6 +34,7 @@
 #include "EditionType.h"
 #include "QUtility.h"
 #include "ProcessorArch.h"
+#include "LogFileReader.h"
 
 #include <QtCore>
 #include <QtGui>
@@ -95,7 +96,8 @@ MainWindow::MainWindow(QSettings& settings, AppConfig& appConfig) :
 	m_pCancelButton(NULL),
 	m_SuppressAutoConfigWarning(false),
 	m_BonjourInstall(NULL),
-	m_SuppressEmptyServerWarning(false)
+	m_SuppressEmptyServerWarning(false),
+	m_pLogFileReader(NULL)
 {
 	setupUi(this);
 
@@ -110,10 +112,8 @@ MainWindow::MainWindow(QSettings& settings, AppConfig& appConfig) :
 
 #if defined(Q_OS_WIN)
 	// ipc must always be enabled, so that we can disable command when switching to desktop mode.
-	connect(&m_IpcClient, SIGNAL(readLogLine(const QString&)), this, SLOT(appendLogRaw(const QString&)));
-	connect(&m_IpcClient, SIGNAL(errorMessage(const QString&)), this, SLOT(appendLogError(const QString&)));
-	connect(&m_IpcClient, SIGNAL(infoMessage(const QString&)), this, SLOT(appendLogNote(const QString&)));
 	m_IpcClient.connectToHost();
+	setupLogFileReader();
 #endif
 
 	// change default size based on os
@@ -154,6 +154,10 @@ MainWindow::~MainWindow()
 
 	if (m_BonjourInstall != NULL) {
 		delete m_BonjourInstall;
+	}
+
+	if (m_pLogFileReader != NULL) {
+		delete m_pLogFileReader;
 	}
 }
 
@@ -468,6 +472,17 @@ bool MainWindow::autoHide()
 	}
 
 	return false;
+}
+
+void MainWindow::setupLogFileReader()
+{
+	QString filename;
+	if (appConfig().logToFile()) {
+		filename = m_AppConfig.logFilename();
+	}
+
+	m_pLogFileReader = new LogFileReader(filename);
+	connect(m_pLogFileReader, SIGNAL(readLogLine(const QString&)), this, SLOT(appendLogRaw(const QString&)));
 }
 
 void MainWindow::clearLog()
@@ -1025,6 +1040,9 @@ void MainWindow::on_m_pActionSettings_triggered()
 	{
 		onModeChanged(true, true);
 	}
+
+	delete m_pLogFileReader;
+	setupLogFileReader();
 }
 
 void MainWindow::autoAddScreen(const QString name)

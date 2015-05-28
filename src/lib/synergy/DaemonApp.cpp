@@ -213,7 +213,7 @@ DaemonApp::mainLoop(bool logToFile)
 		// send logging to gui via ipc, log system adopts outputter.
 		m_ipcLogOutputter = new IpcLogOutputter(*m_ipcServer, true);
 		CLOG->insert(m_ipcLogOutputter);
-		
+
 #if SYSAPI_WIN32
 		m_watchdog = new MSWindowsWatchdog(false, *m_ipcServer, *m_ipcLogOutputter);
 		m_watchdog->setFileLogOutputter(m_fileLogOutputter);
@@ -340,20 +340,16 @@ DaemonApp::handleIpcMessage(const Event& e, void*)
 				}
 
 #if SYSAPI_WIN32
-				String logFilename;
+				String filename;
 				if (argBase->m_logFile != NULL) {
-					logFilename = String(argBase->m_logFile);
-					ARCH->setting("LogFilename", logFilename);
-					m_watchdog->setFileLogOutputter(m_fileLogOutputter);
+					filename = String(argBase->m_logFile);
+
 					command = ArgParser::assembleCommand(argsArray, "--log", 1);
-					LOG((CLOG_DEBUG "removed log file argument and filename %s from command ", logFilename.c_str()));
+					LOG((CLOG_DEBUG "removed log file argument and filename %s from command ", filename.c_str()));
 					LOG((CLOG_DEBUG "new command, elevate=%d command=%s", cm->elevate(), command.c_str()));
 				}
-				else {
-					m_watchdog->setFileLogOutputter(NULL);
-				}
-
-				m_fileLogOutputter->setLogFilename(logFilename.c_str());
+				ARCH->setting("LogFilename", filename);
+				m_fileLogOutputter->setLogFilename(logFilename().c_str());
 #endif
 			}
 			else {

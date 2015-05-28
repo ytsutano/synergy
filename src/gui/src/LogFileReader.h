@@ -1,6 +1,6 @@
 /*
  * synergy -- mouse and keyboard sharing utility
- * Copyright (C) 2015 Synergy Si Ltd.
+ * Copyright (C) 2015 Synergy Si Inc.
  *
  * This package is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,18 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef LOGFILEREADER_H
+#define LOGFILEREADER_H
 
-#include <QString>
+#include <QObject>
 
-class CoreInterface
+class QFileSystemWatcher;
+class QFile;
+
+class LogFileReader : public QObject
 {
-public:
-	CoreInterface();
+	Q_OBJECT
 
-	QString getPluginDir();
-	QString getProfileDir();
-	QString getLogDir();
-	QString getArch();
-	QString run(const QStringList& args, const QString& input = "");
+public:
+	LogFileReader(QString filename);
+	~LogFileReader();
+
+signals:
+	void readLogLine(const QString& text);
+
+public slots:
+	void handleFileChanged(const QString& filenam);
+
+private:
+	QString m_Filename;
+	QFileSystemWatcher* m_pFileSystemWatcher;
+	QFile* m_pFile;
 };
+
+#endif // LOGFILEREADER_H
