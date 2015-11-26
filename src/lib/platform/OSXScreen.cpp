@@ -706,10 +706,9 @@ OSXScreen::fakeMouseWheel(SInt32 xDelta, SInt32 yDelta) const
 {
 	if (xDelta != 0 || yDelta != 0) {
 #if defined(MAC_OS_X_VERSION_10_5)
-		// create a scroll event, post it and release it.  not sure if kCGScrollEventUnitLine
-		// is the right choice here over kCGScrollEventUnitPixel
+		// Use pixel-based scrolling.
 		CGEventRef scrollEvent = CGEventCreateScrollWheelEvent(
-			NULL, kCGScrollEventUnitLine, 2,
+			NULL, kCGScrollEventUnitPixel, 2,
 			mapScrollWheelFromSynergy(yDelta),
 			-mapScrollWheelFromSynergy(xDelta));
 		
@@ -1462,18 +1461,13 @@ OSXScreen::mapMacButtonToSynergy(UInt16 macButton) const
 SInt32
 OSXScreen::mapScrollWheelToSynergy(SInt32 x) const
 {
-	// return accelerated scrolling but not exponentially scaled as it is
-	// on the mac.
-	double d = (1.0 + getScrollSpeed()) * x / getScrollSpeedFactor();
-	return static_cast<SInt32>(120.0 * d);
+	return x;
 }
 
 SInt32
 OSXScreen::mapScrollWheelFromSynergy(SInt32 x) const
 {
-	// use server's acceleration with a little boost since other platforms
-	// take one wheel step as a larger step than the mac does.
-	return static_cast<SInt32>(3.0 * x / 120.0);
+	return x;
 }
 
 double
@@ -1986,10 +1980,10 @@ OSXScreen::handleCGInputEvent(CGEventTapProxy proxy,
 			return event;
 			break;
 		case kCGEventScrollWheel:
-			screen->onMouseWheel(screen->mapScrollWheelToSynergy(
-								 CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis2)),
+			screen->onMouseWheel(-screen->mapScrollWheelToSynergy(
+								 CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis2)),
 								 screen->mapScrollWheelToSynergy(
-								 CGEventGetIntegerValueField(event, kCGScrollWheelEventDeltaAxis1)));
+								 CGEventGetIntegerValueField(event, kCGScrollWheelEventPointDeltaAxis1)));
 			break;
 		case kCGEventKeyDown:
 		case kCGEventKeyUp:
